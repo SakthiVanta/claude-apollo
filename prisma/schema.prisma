@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
@@ -11,9 +9,49 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
-} 
 
+model Lead {
+  id            String   @id @default(cuid())
+  apolloId      String?  @unique
+  firstName     String?
+  lastName      String?
+  email         String?
+  personalEmail String?
+  phone         String?
+  title         String?
+  seniority     String?
+  companyName   String?
+  companyDomain String?
+  industry      String?
+  employees     Int?
+  revenue       String?
+  linkedinUrl   String?
+  city          String?
+  state         String?
+  country       String?
+  enriched      Boolean  @default(false)
+  rawData       Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([email])
+  @@index([companyName])
+}
+
+model SearchSession {
+  id           String   @id @default(cuid())
+  filters      Json
+  totalResults Int?
+  createdAt    DateTime @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      String
+  content   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+}

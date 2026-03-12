@@ -1,64 +1,78 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { StatusBar } from "./components/StatusBar";
+import { ProspectTab } from "./components/ProspectTab";
+import { EnrichTab } from "./components/EnrichTab";
+import { ChatTab } from "./components/ChatTab";
+import { SavedTab } from "./components/SavedTab";
+
+type Tab = "prospect" | "enrich" | "chat" | "saved";
 
 export default function Home() {
+  const [tab, setTab] = useState<Tab>("prospect");
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Top bar */}
+      <header className="flex items-center justify-between px-5 py-2.5 bg-white border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="h-5 w-5 rounded bg-blue-600 flex items-center justify-center shrink-0">
+              <span className="text-white text-xs font-bold leading-none">A</span>
+            </div>
+            <span className="text-sm font-semibold text-gray-800 tracking-tight">Apollo Prospector</span>
+          </div>
+
+          <nav className="flex items-center gap-0.5">
+            {(
+              [
+                { id: "prospect" as Tab, label: "Prospect" },
+                { id: "enrich" as Tab, label: "Enrich" },
+                { id: "saved" as Tab, label: "Saved" },
+                { id: "chat" as Tab, label: "AI Chat" },
+              ] as const
+            ).map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => setTab(id)}
+                className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  tab === id
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        <StatusBar />
+      </header>
+
+      {/* Content */}
+      <main className="flex-1 overflow-hidden p-4">
+        {tab === "prospect" && (
+          <div className="h-full bg-white rounded-lg border border-gray-100 shadow-sm p-4">
+            <ProspectTab />
+          </div>
+        )}
+        {tab === "enrich" && (
+          <div className="h-full overflow-y-auto">
+            <EnrichTab />
+          </div>
+        )}
+        {tab === "saved" && (
+          <div className="h-full bg-white rounded-lg border border-gray-100 shadow-sm p-4">
+            <SavedTab />
+          </div>
+        )}
+        {tab === "chat" && (
+          <div className="h-full overflow-hidden rounded-lg border border-gray-100 shadow-sm bg-white">
+            <ChatTab />
+          </div>
+        )}
       </main>
     </div>
   );
