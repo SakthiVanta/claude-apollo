@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useToast } from "./Toast";
 
 const SESSION_ID = `chat_${Date.now()}`;
@@ -13,6 +13,54 @@ const SUGGESTIONS = [
   "Show contacts at Hyperready Tech",
   "List all my saved company accounts",
 ];
+
+const PLACEHOLDERS = [
+  "Show all my saved Apollo contacts…",
+  "Find Mathan in my contacts…",
+  "Show contacts at Hyperready Tech…",
+  "List all my saved company accounts…",
+  "How many contacts do I have?…",
+];
+
+function useTypingPlaceholder(active: boolean) {
+  const [placeholder, setPlaceholder] = useState("");
+  const phraseIdx = useRef(0);
+  const charIdx = useRef(0);
+  const deleting = useRef(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const tick = useCallback(() => {
+    const phrase = PLACEHOLDERS[phraseIdx.current];
+    if (!deleting.current) {
+      charIdx.current += 1;
+      setPlaceholder(phrase.slice(0, charIdx.current));
+      if (charIdx.current === phrase.length) {
+        deleting.current = true;
+        timer.current = setTimeout(tick, 1800);
+      } else {
+        timer.current = setTimeout(tick, 55);
+      }
+    } else {
+      charIdx.current -= 1;
+      setPlaceholder(phrase.slice(0, charIdx.current));
+      if (charIdx.current === 0) {
+        deleting.current = false;
+        phraseIdx.current = (phraseIdx.current + 1) % PLACEHOLDERS.length;
+        timer.current = setTimeout(tick, 400);
+      } else {
+        timer.current = setTimeout(tick, 28);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!active) return;
+    timer.current = setTimeout(tick, 600);
+    return () => { if (timer.current) clearTimeout(timer.current); };
+  }, [active, tick]);
+
+  return placeholder;
+}
 
 export function ChatTab() {
   const { error: toastError } = useToast();
@@ -27,12 +75,13 @@ export function ChatTab() {
 
   const { messages, sendMessage, status, error } = useChat({ transport });
 
+  const isLoading = status === "streaming" || status === "submitted";
+
   const [input, setInput] = useState("");
   const [rows, setRows] = useState(1);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  const isLoading = status === "streaming" || status === "submitted";
+  const typingPlaceholder = useTypingPlaceholder(input === "" && messages.length === 0 && !isLoading);
 
   useEffect(() => {
     if (error) toastError("Chat error", error.message.slice(0, 100));
@@ -165,7 +214,7 @@ export function ChatTab() {
             value={input}
             onChange={handleTextarea}
             onKeyDown={handleKey}
-            placeholder="Describe your ideal customer or ask about a specific person…"
+            placeholder={typingPlaceholder || "Ask about your contacts…"}
             className="flex-1 resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder-gray-300 focus:border-blue-400 focus:outline-none"
             disabled={isLoading}
           />

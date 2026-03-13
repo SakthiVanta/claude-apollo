@@ -6,8 +6,8 @@ import { ToastProvider } from "./components/Toast";
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
 export const metadata: Metadata = {
-  title: "Apollo Prospector",
-  description: "B2B lead search and enrichment powered by Apollo.io",
+  title: "Apollo Lead Management",
+  description: "B2B lead search and enrichment powered by Apollo Lead Management",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

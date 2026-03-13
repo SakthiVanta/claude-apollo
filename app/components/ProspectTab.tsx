@@ -64,7 +64,7 @@ export function ProspectTab() {
       const msg = e instanceof Error ? e.message : String(e);
       setError(msg);
       if (planRestriction) {
-        warning("Free plan restriction", "Bulk search requires a paid Apollo plan.");
+        warning("Free plan restriction", "People search and enrichment both require a paid Apollo plan.");
       } else {
         toastError("Search failed", msg.slice(0, 100));
       }
@@ -131,9 +131,8 @@ export function ProspectTab() {
               <span className="text-xs opacity-80">{error}</span>
               {planRestriction && (
                 <span className="text-xs mt-1">
-                  Bulk people search requires a paid Apollo plan.{" "}
-                  <strong>Use the Enrich tab</strong> to look up individuals, or{" "}
-                  <strong>AI Chat</strong> to describe your ICP.
+                  People search and contact enrichment both require a paid Apollo plan.{" "}
+                  Use <strong>AI Chat</strong> to search your saved CRM contacts.
                 </span>
               )}
             </div>

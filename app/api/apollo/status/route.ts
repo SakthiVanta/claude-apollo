@@ -5,17 +5,17 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Apollo Free Plan — available endpoints:
- *   ✅ GET  /email_accounts          — list linked email accounts
- *   ✅ POST /people/match            — enrich single person (1 credit)
- *   ✅ POST /people/bulk_match       — enrich up to 10 (1 credit each)
- *   ✅ GET  /organizations/enrich    — enrich company by domain (credits)
- *   ✅ POST /emailer_campaigns/search — list sequences
+ * Apollo Free Plan — confirmed via live API calls:
  *   ✅ POST /contacts/search         — search your own saved CRM contacts
  *   ✅ POST /accounts/search         — search your saved company accounts
- *   ❌ POST /mixed_people/search     — bulk people search (paid only)
- *   ❌ POST /mixed_companies/search  — bulk company search (paid only)
- *   ❌ POST /organizations/bulk_enrich — bulk org enrich (paid only)
+ *   ❌ POST /people/match            — 403: not accessible on free plan
+ *   ❌ POST /people/bulk_match       — 403: same endpoint restriction
+ *   ❌ GET  /organizations/enrich    — 403: not accessible on free plan
+ *   ❌ POST /mixed_people/search     — 403: API_INACCESSIBLE on free plan
+ *   ❌ POST /mixed_companies/search  — 403: API_INACCESSIBLE on free plan
+ *   ❌ POST /organizations/bulk_enrich — 403: paid only
+ *   ❌ GET  /email_accounts          — requires Master API key
+ *   ❌ POST /emailer_campaigns/search — requires Master API key
  */
 export async function GET() {
   const result = await checkConnection();
@@ -23,16 +23,17 @@ export async function GET() {
     {
       ...result,
       freeFeatures: [
-        "Enrich individual contacts (1 credit each)",
-        "Enrich companies by domain",
         "Search your saved CRM contacts",
-        "Search your saved accounts",
-        "Manage email sequences",
+        "Search your saved company accounts",
       ],
       paidFeatures: [
+        "Enrich individual contacts (people/match)",
+        "Enrich companies by domain",
         "Bulk people search",
         "Bulk company search",
         "Bulk enrichment",
+        "Email sequences (requires Master API key)",
+        "Email accounts (requires Master API key)",
       ],
     },
     { status: result.ok ? 200 : 503 }

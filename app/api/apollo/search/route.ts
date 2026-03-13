@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const msg = e instanceof Error ? e.message : String(e);
     const isPlanError = msg.includes("free plan") || msg.includes("API_INACCESSIBLE");
     return NextResponse.json(
-      { error: isPlanError ? "People search requires an Apollo paid plan. Use the Enrich tab or AI Chat for individual lookups." : msg, planRestriction: isPlanError },
+      { error: isPlanError ? "People search requires a paid Apollo plan (mixed_people/search is blocked on the free plan)." : msg, planRestriction: isPlanError },
       { status: isPlanError ? 403 : 500 }
     );
   }
